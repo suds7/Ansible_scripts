@@ -17,14 +17,3 @@
 
     - name: save output to a file
       copy: content="{{ print_output.stdout[0] }}" dest="./output/{{ inventory_hostname }}.txt"
-
-
-# Description:
-# Use the ios commands module to get show run information 
-# Go to enable mode
-# Save the output to files
-# http://docs.ansible.com/ansible/latest/ios_command_module.html
-
-# Commands to run: 
-#1) ansible-playbook shver3.yml -u david -k
-
