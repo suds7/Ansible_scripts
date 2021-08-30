@@ -1,0 +1,102 @@
+Building configuration...
+
+Current configuration : 1092 bytes
+!
+! Last configuration change at 11:22:07 EET Mon Aug 30 2021 by admin
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+!
+hostname R1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+clock timezone EET 2 0
+!
+!
+!
+!
+!
+!
+ip domain name example.com
+ip cef
+no ipv6 cef
+!
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+username admin privilege 15 password 0 admin
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Ethernet0/0
+ ip address 192.168.1.100 255.255.255.0
+!
+interface Ethernet0/1
+ description nothing temp
+ ip address 192.168.20.101 255.255.255.0
+!
+interface Ethernet0/2
+ no ip address
+ shutdown
+!
+interface Ethernet0/3
+ no ip address
+ shutdown
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+!
+ip access-list extended test
+ permit ip host 192.0.2.1 any log
+ permit ip host 192.0.2.2 any log
+ permit ip host 192.0.2.3 any log
+ permit ip host 192.0.2.4 any log
+ permit ip host 192.0.2.5 any log
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ logging synchronous
+ login local
+line aux 0
+line vty 0 4
+ privilege level 15
+ login local
+!
+!
+!
+end
