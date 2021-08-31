@@ -1,6 +1,8 @@
 Building configuration...
 
-Current configuration : 1021 bytes
+Current configuration : 1091 bytes
+!
+! Last configuration change at 18:38:16 EET Tue Aug 31 2021 by admin
 !
 version 15.2
 service timestamps debug datetime msec
@@ -58,7 +60,7 @@ interface Ethernet0/0
  ip address 192.168.1.100 255.255.255.0
 !
 interface Ethernet0/1
- description nothing temp
+ description change test
  ip address 192.168.20.101 255.255.255.0
 !
 interface Ethernet0/2
