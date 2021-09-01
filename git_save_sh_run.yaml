@@ -1,0 +1,63 @@
+---
+- name: Backup show run (enable mode commands)
+  hosts: R
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: run enable level commands
+      ios_command:
+        authorize: yes
+        commands:
+          - show run
+
+      register: print_output
+
+    -  debug: var=print_output.stdout_lines
+
+    - name: save output to a file
+      copy: content="{{ print_output.stdout[0] }}" dest="./output/{{ inventory_hostname }}.txt"
+
+    - name: Add any new files to commit
+      delegate_to: localhost
+      shell: "git add ."
+      args:
+          chdir: /home/ansible/playbooks/output
+      register: gitadd
+    - debug:
+        var: gitadd.cmd
+
+    - name: Check repo is up to date
+      delegate_to: localhost
+      git:
+        repo: "https://github.com/suds7/Ansible_scripts.git"
+        dest: "/home/ansible/playbooks/output"
+        update: yes
+        version: master
+      register: git
+      ignore_errors: True
+    - debug:
+          var: git
+
+    - name: Commit changes
+      delegate_to: localhost
+      shell: git commit -m "Commit from Ansible"
+      args:
+        chdir: "/home/ansible/playbooks/output"
+      register: gitcommit
+      when: git.msg is defined
+    - debug:
+        var: gitcommit.stdout        
+
+    - name: Push commit to remote repository
+      delegate_to: localhost
+      shell: git push -u origin main
+      args:
+        chdir: "/home/ansible/playbooks/output"
+      register: gitpush
+      when: git.msg is defined
+    - debug:
+        var: gitpush      
+            
+        
+
