@@ -1,0 +1,34 @@
+---
+- name: Backup show run (enable mode commands)
+  hosts: R
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: run enable level commands
+      ios_command:
+        authorize: yes
+        commands:
+          - show run
+
+      register: print_output
+
+    -  debug: var=print_output.stdout_lines
+
+    - name: save output to a file
+      copy: content="{{ print_output.stdout[0] }}" dest="./output/{{ inventory_hostname }}.txt"
+
+
+    - name: Copy Image to IOS device
+      net_put: 
+        src: "./images/c2960-lanbasek9-mz.122-57.SE12.bin"
+        dest: "flash:/c2960-lanbasek9-mz.122-57.SE12.bin"
+      vars: 
+        ansible_command_timeout: 700
+
+    - name: Change Boot Variable to new image 
+      ios_config: 
+        commands: 
+          - "boot system flash:c2960-lanbasek9-mz.122-57.SE12.bin"
+        save_when: always
+
