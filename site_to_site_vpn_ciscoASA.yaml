@@ -1,0 +1,74 @@
+---
+- name: Backup show run (enable mode commands)
+  hosts: ASA
+  gather_facts: false
+  connection: local
+  vars:
+    crypto_map_name: OUTSIDE_MAP
+    crypto_map_number: 10
+    peer_ip: 192.168.1.102
+    transform_set: ESP-AES-256-SHA
+    crypto_acl: VPN_EXTERNAL_ABC
+    source_ip: 172.20.1.10
+    dest_ip: 172.30.1.10
+    pre_shared_key: abcxyz
+
+   
+  tasks:
+    - name: Setup Transform-Set
+      asa_config:
+        lines:
+        - crypto ipsec ikev1 transform-set ESP-AES-256-SHA esp-aes-256 esp-sha-hmac
+
+    - name: Setup VPN ACLs
+      asa_config:
+        lines:
+        - access-list {{ crypto_acl }} permit ip host {{ source_ip }} host {{ dest_ip }}        
+
+    - name:  Debug var
+      debug:
+        var=crypto_map_number
+
+    - name: Setup IPSEC phase 1
+      asa_config:
+        lines:
+        - authentication pre-share 
+        - encryption aes
+        - hash sha
+        - group 2
+        - lifetime 3600 
+        parents:
+        - crypto ikev1 policy 10         
+
+    - name: Setup Phase 2 crypto map
+      asa_config:
+        lines:
+        - crypto map {{ crypto_map_name }} {{ crypto_map_number }} set pfs group5
+        - crypto map {{ crypto_map_name }} {{ crypto_map_number }} match address {{ crypto_acl }}
+        - crypto map {{  crypto_map_name }} {{ crypto_map_number }} set peer {{ peer_ip }}
+        - crypto map {{ crypto_map_name }} {{ crypto_map_number }} set ikev1 transform-set {{ transform_set }}
+        - crypto map {{ crypto_map_name }} {{ crypto_map_number }} set security-association lifetime seconds 3600
+        - tunnel-group {{ peer_ip }} type ipsec-l2l
+        - group-policy {{ crypto_acl }} internal
+
+    - name: Setup Tunnel group policy
+      asa_config:
+        lines:
+        - vpn-filter value {{ crypto_acl }}
+        - vpn-tunnel-protocol ikev1 
+        parents:
+        - group-policy {{ crypto_acl }} attributes
+
+    - name: Setup Tunnel group general properties
+      asa_config:
+        lines:
+        - default-group-policy {{ crypto_acl }}
+        parents:
+        - tunnel-group {{ peer_ip }} general-attributes
+
+    - name: Setup Tunnel group ipsec properties
+      asa_config:
+        lines:
+        - ikev1 pre-shared-key {{ pre_shared_key }}
+        parents:
+        - tunnel-group {{ peer_ip }} ipsec-attributes
