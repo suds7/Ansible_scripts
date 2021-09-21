@@ -1,6 +1,6 @@
 ---
 - name: Backup show run (enable mode commands)
-  hosts: ASA
+  hosts: ASA1
   gather_facts: false
   connection: local
   vars:
@@ -10,20 +10,49 @@
     transform_set: ESP-AES-256-SHA
     crypto_acl: VPN_EXTERNAL_ABC
     source_ip: 172.20.1.10
-    dest_ip: 172.30.1.10
+    nat_source_ip: 10.1.1.1
+    dest_ip: 10.1.1.2
     pre_shared_key: abcxyz
 
    
   tasks:
-    - name: Setup Transform-Set
+    - name: Setup Transform-Set & few required commands
       asa_config:
         lines:
         - crypto ipsec ikev1 transform-set ESP-AES-256-SHA esp-aes-256 esp-sha-hmac
+        - crypto ikev1 enable outside
+        - crypto isakmp identity address
+
+    - name: Create object for source network
+      asa_config:
+        lines:
+        - host {{ source_ip }} 
+        parents:
+        - object network obj-{{ source_ip }} 
+
+    - name: Create object for nat source network
+      asa_config:
+        lines:
+        - host {{ nat_source_ip }} 
+        parents:
+        - object network obj-{{ nat_source_ip }} 
+
+    - name: Create object for destination network
+      asa_config:
+        lines:
+        - host {{ dest_ip }} 
+        parents:
+        - object network obj-{{ dest_ip }}               
+
+    - name: Setup NAT to hide internal address 
+      asa_config:
+        lines:
+        - nat (inside,outside) source static obj-{{ source_ip }} obj-{{ nat_source_ip }} destination static obj-{{ dest_ip }} obj-{{ dest_ip }}
 
     - name: Setup VPN ACLs
       asa_config:
         lines:
-        - access-list {{ crypto_acl }} permit ip host {{ source_ip }} host {{ dest_ip }}        
+        - access-list {{ crypto_acl }} permit ip host {{ nat_source_ip }} host {{ dest_ip }}        
 
     - name:  Debug var
       debug:
