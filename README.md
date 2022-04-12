@@ -5,7 +5,7 @@ For my learning purpose i have created the below scripts. I have tested this scr
 
 # git_save_sh_run.yaml
 
-This script runs the show run command on the Cisco devices and store that show run command in the git. Using the git it is very easy to track down the changes in network configuration. So when there are changes on the network device it will easier to track down the faulty changes.
+This script runs the show run command on the Cisco devices and store that show run command output in the git. Using the git it is very easy to track down the changes in network configuration. So when there are changes on the network device it will easier to track down the faulty changes.
 
 For demo you can see my home router configuration in the /output folder
 
