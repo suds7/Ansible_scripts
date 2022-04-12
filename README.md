@@ -1,17 +1,17 @@
 # Ansible scripts for Network Engineers
 
-For my learning purpose i have created the below scripts. I have tested this scripts on home lab. Please use them at your own risk in production
+For my learning purpose, I have created the below scripts. I have tested these scripts in the home lab. Please use them at your own risk in production
 
 
 # git_save_sh_run.yaml
 
-This script runs the show run command on the Cisco devices and store that show run command output in the git. Using the git it is very easy to track down the changes in network configuration. So when there are changes on the network device it will easier to track down the faulty changes.
+This script runs the show run command on the Cisco devices and stores that show run command output in the git. Using the git it is very easy to track down the changes in network configuration. So when there are changes on the network device it will be easier to track down the faulty changes.
 
-For demo you can see my home router configuration in the /output folder
+For demo, you can see my home router configuration in the /output folder
 
 # site_to_site_vpn_ciscoASA.yaml
 
-This script setup the Site-to-Site VPN on the Cisco ASA firewalls. If you are settings lots of VPN every day. Then this script might help you. 
+This script set up the Site-to-Site VPN on the Cisco ASA firewalls. If you are settings lots of VPNs every day. Then this script might help you. 
 
 Before running the script make sure to modify the variable parameters
 
